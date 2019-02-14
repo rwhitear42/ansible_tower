@@ -10,3 +10,9 @@
         wibble: this_is_cool
         wobble: dingle
         smelly: wahey
+
+    - debug:
+        msg:
+        - "{{ wibble }}"
+        - "{{ wobble }}"
+        - "{{ smelly }}"
