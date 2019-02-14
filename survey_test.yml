@@ -4,3 +4,7 @@
     - name: Source IP Address
       debug:
         msg: "{{ src_ip_address }}"
+
+    - name: Set Facts
+      set_fact:
+        wibble: this_is_cool
