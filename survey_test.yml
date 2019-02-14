@@ -8,3 +8,5 @@
     - name: Set Facts
       set_fact:
         wibble: this_is_cool
+        wobble: dingle
+        smelly: wahey
