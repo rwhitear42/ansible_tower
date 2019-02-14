@@ -1,0 +1,6 @@
+- name: Ansible Test
+  hosts: all
+  tasks:
+    - name: Source IP Address
+      debug:
+        msg: "{{ src_ip_address }}"
