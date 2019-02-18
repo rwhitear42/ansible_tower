@@ -85,22 +85,22 @@
       username:       "{{ apic_username }}"
       password:       "{{ apic_password }}"
     debug_on_state:   "{{ debug_on | default(false) }}"
-  vars_prompt:
-    - name:           "src_ip_addr"
-      prompt:         "Enter source IP address"
-      private:        no
+#  vars_prompt:
+#    - name:           "src_ip_addr"
+#      prompt:         "Enter source IP address"
+#      private:        no
+#
+#    - name:           "dst_ip_addr"
+#      prompt:         "Enter destination IP address"
+#      private:        no
 
-    - name:           "dst_ip_addr"
-      prompt:         "Enter destination IP address"
-      private:        no
-
-    - name:           "subj_name"
-      prompt:         "Enter the protocol type (tcp or udp)"
-      private:        no
-
-    - name:           "dst_port"
-      prompt:         "Enter the destination port to be opened"
-      private:        no
+#    - name:           "subj_name"
+#      prompt:         "Enter the protocol type (tcp or udp)"
+#      private:        no
+#
+#    - name:           "dst_port"
+#      prompt:         "Enter the destination port to be opened"
+#      private:        no
 
   tasks:
   # Create an ACI snapshot
