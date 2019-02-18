@@ -75,7 +75,7 @@
 #    terms, this License shall take precedence.
 #
 - name:               Initial Setup
-  hosts:              "{{ apic }}"
+  hosts:              localhost
   connection:         local
   gather_facts:       no
   vars:
