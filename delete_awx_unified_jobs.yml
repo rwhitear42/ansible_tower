@@ -1,0 +1,41 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    towerhost: 10.52.249.125
+    username: admin
+    password: password
+
+  tasks:
+
+    - name: Check AWX Unified Jobs
+      uri:
+        url: "http://{{ towerhost }}/api/v2/unified_jobs/?order_by=-finished&not__launch_type=sync"
+        method: GET
+        user: "{{ username }}"
+        password: "{{ password }}"
+        force_basic_auth: yes
+        status_code: 200,404
+        timeout: 10
+      register: tower_unfied_jobs
+
+    - name: Retrieve Job IDs
+      set_fact:
+        unfied_job_list:  "{{ tower_unfied_jobs | json_query('json.results[*].url') | list }}"
+      when: tower_unfied_jobs | json_query('status') == 200
+
+    - debug:
+        var: unfied_job_list
+
+    - name: Delete Unified Jobs
+      uri:
+        url: "http://{{ towerhost }}{{ item }}"
+        method: DELETE
+        user: "{{ username }}"
+        password: "{{ password }}"
+        force_basic_auth: yes
+        status_code: 204,404
+        timeout: 10
+      with_items: "{{ unfied_job_list }}"
