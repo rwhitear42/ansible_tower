@@ -79,9 +79,9 @@
   gather_facts: no
 
   vars:
-    towerhost: 10.52.249.125
-    username: admin
-    password: password
+    towerhost: "{{ towerhost }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
 
   tasks:
 
