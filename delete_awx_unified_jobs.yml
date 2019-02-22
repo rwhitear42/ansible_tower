@@ -80,17 +80,17 @@
 
   vars:
     towerhost: "{{ towerhost }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
+    tower_creds: &tower_creds
+      user: "{{ username }}"
+      password: "{{ password }}"
 
   tasks:
 
     - name: Check AWX Unified Jobs
       uri:
+        <<: *tower_creds
         url: "http://{{ towerhost }}/api/v2/unified_jobs/?order_by=-finished&not__launch_type=sync"
         method: GET
-        user: "{{ username }}"
-        password: "{{ password }}"
         force_basic_auth: yes
         status_code: 200,404
         timeout: 10
@@ -106,10 +106,9 @@
 
     - name: Delete Unified Jobs
       uri:
+        <<: *tower_creds
         url: "http://{{ towerhost }}{{ item }}"
         method: DELETE
-        user: "{{ username }}"
-        password: "{{ password }}"
         force_basic_auth: yes
         status_code: 204,404
         timeout: 10
