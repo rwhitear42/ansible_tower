@@ -1,0 +1,136 @@
+{
+	"info": {
+		"_postman_id": "229f79f0-fb7e-433f-b1a4-f56a1a113e29",
+		"name": "Launch a Template",
+		"description": "Launch an Ansible Tower template from here. ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET Template URL",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "70e79f5a-8da3-461b-9b88-2edb087242df",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.environment.set(\"template_url\", jsonData.results[0].url);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{tower_host}}/api/v2/job_templates/?search={{template_name}}",
+					"protocol": "http",
+					"host": [
+						"{{tower_host}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"job_templates",
+						""
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "{{template_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Add ACI Contract",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"extra_vars\": {\n    \"src_ip_addr\": \"{{src_ip_addr}}\",\n    \"dst_ip_addr\": \"{{dst_ip_addr}}\",\n    \"subj_name\": \"{{subj_name}}\",\n    \"dst_port\": \"{{dst_port}}\"\n  }\n}"
+				},
+				"url": {
+					"raw": "http://{{tower_host}}{{template_url}}launch/",
+					"protocol": "http",
+					"host": [
+						"{{tower_host}}{{template_url}}launch"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "password",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "admin",
+				"type": "string"
+			}
+		]
+	}
+}
