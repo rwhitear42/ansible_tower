@@ -1,0 +1,377 @@
+{
+	"info": {
+		"_postman_id": "792f273b-c5d5-433f-bba1-781aa8c2831d",
+		"name": "Runner_Ansible_Tower_Build_from_Scratch",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "POST Create Project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ef651486-e82a-4edd-bb25-c74544a5568d",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.environment.set(\"project_id\", jsonData.id);",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"{{project_name}}\",\n  \"organization\": 1,\n  \"scm_type\": \"git\",\n  \"base_dir\": \"/var/lib/awx/projects\",\n  \"scm_url\": \"{{project_url}}\",\n  \"scm_update_on_launch\": true,\n  \"scm_update_cache_timeout\": \"0\",\n  \"custom_virtualenv\": null\n}"
+				},
+				"url": {
+					"raw": "http://{{tower_host}}/api/v2/projects/",
+					"protocol": "http",
+					"host": [
+						"{{tower_host}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"projects",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Create Inventory",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cc0ad365-0c8b-47dd-b0a3-7c9a4ff9a9a1",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.environment.set(\"inventory_id\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "99ffbfcb-a34e-4153-920d-1f722a90cb61",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"{{inventory_name}}\",\n  \"organization\": 1,\n  \"variables\": \"---\\napic: {{inventory_host}}\\napic_username: {{inventory_username}}\\napic_password: {{inventory_password}}\"\n}"
+				},
+				"url": {
+					"raw": "http://{{tower_host}}/api/v2/inventories/",
+					"protocol": "http",
+					"host": [
+						"{{tower_host}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"inventories",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Add Host to Inventory",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cc0ad365-0c8b-47dd-b0a3-7c9a4ff9a9a1",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"variables\": \"\",\n  \"name\": \"{{inventory_host}}\",\n  \"enabled\": true,\n  \"inventory\": \"{{inventory_id}}\"\n}"
+				},
+				"url": {
+					"raw": "http://{{tower_host}}/api/v2/hosts/",
+					"protocol": "http",
+					"host": [
+						"{{tower_host}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"hosts",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Create Template (20 sec delay before runs)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5769169c-b2e5-4f54-a8ca-c12d951e0d31",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.environment.set(\"template_id\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "699d3ab7-1926-4f40-871a-1194d462c8e5",
+						"exec": [
+							"function foo() {",
+							"    return (new Promise((resolve, reject) => {",
+							"        setTimeout(() => {",
+							"            resolve(\"done!\");   // passing argument is optional, can just use resolve()",
+							"        }, 20000)   // specify the delay time in ms here..",
+							"    }))",
+							"}",
+							"",
+							"async function waitForMe() {",
+							"    await foo().then((val) => {",
+							"        console.log(val);  // not required, you can just do an await without then",
+							"    })",
+							"}",
+							"",
+							"waitForMe();"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"{{template_name}}\",\n  \"job_type\": \"run\",\n  \"inventory\": {{inventory_id}},\n  \"project\": {{project_id}},\n  \"playbook\": \"{{template_playbook_name}}\",\n  \"verbosity\": 0,\n  \"job_tags\": \"\",\n  \"skip_tags\": \"\",\n  \"custom_virtualenv\": null,\n  \"job_slice_count\": 1,\n  \"timeout\": 0,\n  \"allow_callbacks\": false,\n  \"use_fact_cache\": true,\n  \"forks\": 0,\n  \"ask_diff_mode_on_launch\": false,\n  \"ask_tags_on_launch\": false,\n  \"ask_skip_tags_on_launch\": false,\n  \"ask_limit_on_launch\": false,\n  \"ask_job_type_on_launch\": false,\n  \"ask_verbosity_on_launch\": false,\n  \"ask_inventory_on_launch\": false,\n  \"ask_variables_on_launch\": false,\n  \"ask_credential_on_launch\": false,\n  \"extra_vars\": \"\",\n  \"survey_enabled\": false\n}"
+				},
+				"url": {
+					"raw": "http://{{tower_host}}/api/v2/job_templates/",
+					"protocol": "http",
+					"host": [
+						"{{tower_host}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"job_templates",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Create Survey Spec",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"\",\n  \"description\": \"\",\n  \"spec\": [\n    {\n      \"question_name\": \"Source IP Address\",\n      \"question_description\": \"\",\n      \"required\": true,\n      \"type\": \"text\",\n      \"variable\": \"src_ip_addr\",\n      \"min\": 0,\n      \"max\": 1024,\n      \"default\": \"\",\n      \"choices\": \"\",\n      \"new_question\": true\n    },\n    {\n      \"question_name\": \"Destination IP Address\",\n      \"question_description\": \"\",\n      \"required\": true,\n      \"type\": \"text\",\n      \"variable\": \"dst_ip_addr\",\n      \"min\": 0,\n      \"max\": 1024,\n      \"default\": \"\",\n      \"choices\": \"\",\n      \"new_question\": true\n    },\n    {\n      \"question_name\": \"Protocol Type (tcp or udp)\",\n      \"question_description\": \"\",\n      \"required\": true,\n      \"type\": \"multiplechoice\",\n      \"variable\": \"subj_name\",\n      \"min\": null,\n      \"max\": null,\n      \"default\": \"\",\n      \"choices\": \"tcp\\nudp\",\n      \"new_question\": true\n    },\n    {\n      \"question_name\": \"Destination Port\",\n      \"question_description\": \"\",\n      \"required\": true,\n      \"type\": \"text\",\n      \"variable\": \"dst_port\",\n      \"min\": 0,\n      \"max\": 1024,\n      \"default\": \"\",\n      \"choices\": \"\",\n      \"new_question\": true\n    }\n  ]\n}"
+				},
+				"url": {
+					"raw": "http://{{tower_host}}/api/v2/job_templates/{{template_id}}/survey_spec/",
+					"protocol": "http",
+					"host": [
+						"{{tower_host}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"job_templates",
+						"{{template_id}}",
+						"survey_spec",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Enable Survey Spec",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"survey_enabled\":true}"
+				},
+				"url": {
+					"raw": "http://{{tower_host}}/api/v2/job_templates/{{template_id}}/",
+					"protocol": "http",
+					"host": [
+						"{{tower_host}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"job_templates",
+						"{{template_id}}",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
