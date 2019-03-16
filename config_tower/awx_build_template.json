@@ -1,0 +1,20 @@
+{
+  "awx_host": "",
+  "awx_username": "",
+  "awx_password": "",
+  "organizations": [],
+  "inventories": [],
+  "job_templates": [
+    {
+      "name": "test job 1",
+      "job_type": "run",
+      "inventory": 2,
+      "project": 6,
+      "playbook": "add_aci_contract.yml"
+    }
+  ],
+  "surveys": [],
+  "projects": [],
+  "credentials": [],
+  "users": []
+}
