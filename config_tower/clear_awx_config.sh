@@ -76,11 +76,46 @@
 #    terms, this License shall take precedence.
 #
 
-declare awx_host="10.52.206.88"
-declare awx_username="admin"
-declare awx_password="password"
+declare awx_host=""
+declare awx_username=""
+declare awx_password=""
+
+if [[ $# -ge 1 ]]; then
+  while [[ $1 ]]; do
+    if [[ $1 == "-h" ]]; then
+      echo -e "\n  Usage: clear_awx_config.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password>"
+      echo -e "\n  e.g. clear_awx_config.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\"\n"
+      exit 0
+    elif [[ $1 == "--awx_host" ]]; then
+      shift
+      awx_host="$1"
+      continue
+    elif [[ $1 == "--awx_username" ]]; then
+      shift
+      awx_username="$1"
+      continue
+    elif [[ $1 == "--awx_password" ]]; then
+      shift
+      awx_password="$1"
+      continue
+    fi
+    shift
+  done
+else
+  echo -e "\n  Usage: clear_awx_config.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password>"
+  echo -e "\n  e.g. clear_awx_config.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\"\n"
+  exit 0
+fi
+
+if [[ "$awx_host" == ""  || "$awx_username" == "" || "$awx_password" == "" ]]; then
+  echo -e "\n  Usage: clear_awx_config.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password>"
+  echo -e "\n  e.g. clear_awx_config.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\"\n"
+  exit 0
+fi
 
 # This script is disruptive. Ensure that the end user is aware of what they are doing.
+echo -e "\nYou have chosen to clear the configuration from the following AWX host:\n"
+echo -e "AWX host: $awx_host\nUsername: $awx_username\nPassword: $awx_password"
 echo -n -e "\nThis script will clear configuration AWX elements. Are you sure you want to do this (y/n)? "
 read confirmation
 
