@@ -1,20 +1,41 @@
 {
-  "awx_host": "",
-  "awx_username": "",
-  "awx_password": "",
-  "organizations": [],
+  "organizations": [
+    {
+      "name": "UKTME",
+      "description": "UKTME Lab"
+    },
+    {
+      "name": "UKTME2",
+      "description": "UKTME Lab2"
+    }
+  ],
   "inventories": [],
   "job_templates": [
     {
-      "name": "test job 1",
+      "name": "Add ACI Contract",
       "job_type": "run",
-      "inventory": 2,
-      "project": 6,
+      "inventory": "INVENTORY_ID",
+      "project": "PROJECT_ID",
       "playbook": "add_aci_contract.yml"
     }
   ],
   "surveys": [],
-  "projects": [],
+  "projects": [
+    {
+      "name": "rwhitear42/CiscoLive2019",
+      "organization": "UKTME",
+      "scm_type": "git",
+      "scm_url": "https://github.com/rwhitear42/CiscoLive2019",
+      "scm_update_on_launch": true
+    },
+    {
+      "name": "rwhitear42/ansible_tower",
+      "organization": "UKTME2",
+      "scm_type": "git",
+      "scm_url": "https://github.com/rwhitear42/ansible_tower",
+      "scm_update_on_launch": true
+    }
+  ],
   "credentials": [],
   "users": []
 }
