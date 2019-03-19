@@ -1,36 +1,113 @@
 {
   "organizations": [
     {
-      "name": "UKTME",
-      "description": "UKTME Lab"
+      "name": "Default",
+      "description": "Default Organization"
     },
     {
-      "name": "UKTME2",
-      "description": "UKTME Lab2"
+      "name": "Demo1",
+      "description": "Demo1 Org"
+    },
+    {
+      "name": "Demo2",
+      "description": "Demo2 Org"
     }
   ],
-  "inventories": [],
+  "inventories": [
+    {
+      "name": "myAPIC",
+      "organization": "Demo1",
+      "variables": "---\napic: 1.1.1.1\napic_username: admin\napic_password: letme1n"
+    }
+  ],
+  "inventory_hosts": [
+    {
+      "name": "apic.example.com",
+      "enabled": true,
+      "inventory": "myAPIC"
+    }
+  ],
   "job_templates": [
     {
-      "name": "Add ACI Contract",
+      "name": "Create ACI Contract",
       "job_type": "run",
-      "inventory": "INVENTORY_ID",
-      "project": "PROJECT_ID",
-      "playbook": "add_aci_contract.yml"
+      "inventory": "myAPIC",
+      "project": "rwhitear42/ansible_tower",
+      "playbook": "add_aci_contract.yml",
+      "use_fact_cache": true,
+      "survey_enabled": true
     }
   ],
-  "surveys": [],
+  "surveys": [
+    {
+      "job_template": "Create ACI Contract",
+      "survey_spec": {
+        "name": "",
+        "description": "",
+        "spec": [
+          {
+            "question_name": "Source IP Address",
+            "question_description": "",
+            "required": true,
+            "type": "text",
+            "variable": "src_ip_addr",
+            "min": 0,
+            "max": 1024,
+            "default": "",
+            "choices": "",
+            "new_question": true
+          },
+          {
+            "question_name": "Destination IP Address",
+            "question_description": "",
+            "required": true,
+            "type": "text",
+            "variable": "dst_ip_addr",
+            "min": 0,
+            "max": 1024,
+            "default": "",
+            "choices": "",
+            "new_question": true
+          },
+          {
+            "question_name": "Protocol Type (tcp or udp)",
+            "question_description": "",
+            "required": true,
+            "type": "multiplechoice",
+            "variable": "subj_name",
+            "min": null,
+            "max": null,
+            "default": "",
+            "choices": "tcp\nudp",
+            "new_question": true
+          },
+          {
+            "question_name": "Destination Port",
+            "question_description": "",
+            "required": true,
+            "type": "text",
+            "variable": "dst_port",
+            "min": 0,
+            "max": 1024,
+            "default": "",
+            "choices": "",
+            "new_question": true
+          }
+        ]
+      }
+    }
+  ],
   "projects": [
     {
       "name": "rwhitear42/CiscoLive2019",
-      "organization": "UKTME",
+      "organization": "Demo1",
       "scm_type": "git",
       "scm_url": "https://github.com/rwhitear42/CiscoLive2019",
       "scm_update_on_launch": true
     },
     {
       "name": "rwhitear42/ansible_tower",
-      "organization": "UKTME2",
+      "organization": "Demo1",
       "scm_type": "git",
       "scm_url": "https://github.com/rwhitear42/ansible_tower",
       "scm_update_on_launch": true

@@ -76,11 +76,45 @@
 #    terms, this License shall take precedence.
 #
 
-declare awx_host="10.52.206.88"
-declare awx_username="admin"
-declare awx_password="password"
-
+declare awx_host=""
+declare awx_username=""
+declare awx_password=""
 declare build_template_file="./awx_build_template.json"
+
+if [[ $# -ge 1 ]]; then
+  while [[ $1 ]]; do
+    if [[ $1 == "-h" ]]; then
+      echo -e "\n  Usage: awx_config_builder.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password> [--buildfile <path to build_template.json file>]"
+      echo -e "\n  Default build template file location is ./awx_build_template.json"
+      echo -e "\n  e.g. awx_config_builder.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\" --buildfile \"./mybuildfile.json\"\n"
+      exit 0
+    elif [[ $1 == "--awx_host" ]]; then
+      shift
+      awx_host="$1"
+      continue
+    elif [[ $1 == "--awx_username" ]]; then
+      shift
+      awx_username="$1"
+      continue
+    elif [[ $1 == "--awx_password" ]]; then
+      shift
+      awx_password="$1"
+      continue
+    elif [[ $1 == "--buildfile" ]]; then
+      shift
+      build_template_file="$1"
+      continue
+    fi
+    shift
+  done
+fi
+
+if [[ "$awx_host" == ""  || "$awx_username" == "" || "$awx_password" == "" ]]; then
+  echo -e "\n  Usage: awx_config_builder.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password> [--buildfile <path to build_template.json file>]"
+  echo -e "\n  Default build template file location is ./awx_build_template.json"
+  echo -e "\n  e.g. awx_config_builder.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\" --buildfile \"./mybuildfile.json\"\n"
+  exit 0
+fi
 
 declare build_config=$(cat $build_template_file)
 
