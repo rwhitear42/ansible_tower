@@ -84,22 +84,23 @@ declare build_template_file="./awx_build_template.json"
 
 declare build_config=$(cat $build_template_file)
 
-declare organization_count=$(cat $build_template_file | jq '.organizations | length')
-declare inventories_count=$(cat $build_template_file | jq '.inventories | length')
-declare projects_count=$(cat $build_template_file | jq '.projects | length')
+declare new_projects_cnt="$(cat $build_template_file | jq '.projects | length')"
+declare new_orgs_cnt=$(cat $build_template_file | jq '.organizations | length')
+declare new_inventories_cnt=$(cat $build_template_file | jq '.inventories | length')
+declare new_inventory_host_cnt=$(cat $build_template_file | jq '.inventory_hosts | length')
 declare job_templates_count=$(cat $build_template_file | jq '.job_templates | length')
 
 echo -e "\nPlanning to create the following:\n"
-echo -e "$organization_count organizations."
-echo -e "$inventories_count inventories."
-echo -e "$projects_count projects."
+echo -e "$new_orgs_cnt organizations."
+echo -e "$new_inventories_cnt inventories."
+echo -e "$new_inventory_host_cnt inventory hosts."
+echo -e "$new_projects_cnt projects."
 echo -e "$job_templates_count job templates."
 
-echo ""
 
-echo -e "Creating organizations...\n"
+echo -e "\nCreating organizations...\n"
 
-for (( i=0; i<$organization_count; i++ ))
+for (( i=0; i<$new_orgs_cnt; i++ ))
 do
   echo "Creating organization: $(cat $build_template_file | jq ".organizations[$i].name")"
 
@@ -108,51 +109,119 @@ do
 done
 
 
-
-
 echo -e "\nCreating projects...\n"
 
-for (( i=0; i<$projects_count; i++ ))
+declare existing_orgs="$(curl -s -u $awx_username:$awx_password "http://$awx_host/api/v2/organizations/")"
+declare -i existing_orgs_cnt="$(echo $existing_orgs | jq -r '.results | length')"
+
+for (( i=0; i<$new_projects_cnt; i++ ))
 do
   declare project_name=$(cat $build_template_file | jq -r ".projects[$i].name")
-  declare project_org=$(cat $build_template_file | jq -r ".projects[$i].organization")
+  declare project_org_name=$(cat $build_template_file | jq -r ".projects[$i].organization")
   declare project=$(cat $build_template_file | jq -r ".projects[$i]")
 
   echo "Creating project: $project_name"
 
-  # Replace organization name with its id.
-  declare awx_organizations=$(curl -s -u $awx_username:$awx_password "http://$awx_host/api/v2/organizations/")
+  declare -i project_org_id=0
 
-  # Retrieve the job template count.
-  declare -i awx_organizations_count="$(echo $awx_organizations | jq -r '.results | length')"
-
-  declare -i organization_id=0
-  for (( j=0; j<$awx_organizations_count; j++ ))
+  for (( j=0; j<$existing_orgs_cnt; j++ ))
   do
-    awx_org_name=$(echo $awx_organizations | jq -r ".results[$j].name")
-    awx_org_id=$(echo $awx_organizations | jq -r ".results[$j].id")
+    awx_org_name=$(echo $existing_orgs | jq -r ".results[$j].name")
+    awx_org_id=$(echo $existing_orgs | jq -r ".results[$j].id")
 
-    echo "awx_org_name: $awx_org_name"
-    echo "project_org: $project_org"
-
-    if [ $awx_org_name == $project_org ]; then
-      echo "Found a match for $project_org"
-      organization_id=$awx_org_id
+    if [ $awx_org_name == $project_org_name ]; then
+      project_org_id=$awx_org_id
       break;
     fi
   done
 
-  #echo $project
+  if [[ $project_org_id -eq 0 ]]; then
+    echo -e "\nCouldn't find organisation name configured for project [$project_name].\nPlease rectify and retry.\nExiting...\n"
+    exit 0
+  fi
 
-  declare post_data=$(echo $project | jq -r ". | {name: .name, organization: $organization_id, scm_type: .scm_type, scm_url: .scm_url, scm_update_on_launch: .scm_update_on_launch}")
+  declare post_data=$(echo $project | jq -r ". | {name: .name, organization: $project_org_id, scm_type: .scm_type, scm_url: .scm_url, scm_update_on_launch: .scm_update_on_launch}")
 
-  echo $post_data
-
-  echo "organization_id = $organization_id"
-
-  echo -e "\n"
-
-  #declare post_data=$(cat $build_template_file | jq -r ".projects[$i]")
   curl -s -X POST -H "Content-Type: application/json" -d "$post_data" -u "$awx_username:$awx_password" "http://$awx_host/api/v2/projects/" > /dev/null
-  
+
 done
+
+echo ""
+
+echo -e "\nCreating inventories...\n"
+
+declare existing_orgs="$(curl -s -u $awx_username:$awx_password "http://$awx_host/api/v2/organizations/")"
+declare -i existing_orgs_cnt="$(echo $existing_orgs | jq -r '.results | length')"
+
+for (( i=0; i<$new_inventories_cnt; i++ ))
+do
+  declare inventory_name=$(cat $build_template_file | jq -r ".inventories[$i].name")
+  declare inventory_org_name=$(cat $build_template_file | jq -r ".inventories[$i].organization")
+  declare inventory=$(cat $build_template_file | jq -r ".inventories[$i]")
+
+  echo "Creating inventory: $inventory_name"
+
+  declare -i inventory_org_id=0
+
+  for (( j=0; j<$existing_orgs_cnt; j++ ))
+  do
+    awx_org_name=$(echo $existing_orgs | jq -r ".results[$j].name")
+    awx_org_id=$(echo $existing_orgs | jq -r ".results[$j].id")
+
+    if [ $awx_org_name == $inventory_org_name ]; then
+      inventory_org_id=$awx_org_id
+      break;
+    fi
+  done
+
+  if [[ $inventory_org_id -eq 0 ]]; then
+    echo -e "\nCouldn't find organisation name configured for inventory [$inventory_name].\nPlease rectify and retry.\nExiting...\n"
+    exit 0
+  fi
+
+  declare post_data=$(echo $inventory | jq -r ". | {name: .name, organization: $inventory_org_id, variables: .variables}")
+
+  curl -s -X POST -H "Content-Type: application/json" -d "$post_data" -u "$awx_username:$awx_password" "http://$awx_host/api/v2/inventories/" > /dev/null
+
+done
+
+echo ""
+
+echo -e "\nCreating inventory hosts...\n"
+
+declare existing_inventories="$(curl -s -u $awx_username:$awx_password "http://$awx_host/api/v2/inventories/")"
+declare -i existing_inventories_cnt="$(echo $existing_inventories | jq -r '.results | length')"
+
+for (( i=0; i<$new_inventory_host_cnt; i++ ))
+do
+  declare inventory_host_name=$(cat $build_template_file | jq -r ".inventory_hosts[$i].name")
+  declare inventory_name=$(cat $build_template_file | jq -r ".inventory_hosts[$i].inventory")
+  declare inventory_hosts=$(cat $build_template_file | jq -r ".inventory_hosts[$i]")
+
+  echo "Creating inventory host: $inventory_host_name"
+
+  declare -i inventory_host_id=0
+
+  for (( j=0; j<$existing_inventories_cnt; j++ ))
+  do
+    existing_inventory_name=$(echo $existing_inventories | jq -r ".results[$j].name")
+    existing_inventory_id=$(echo $existing_inventories | jq -r ".results[$j].id")
+
+    if [ $existing_inventory_name == $inventory_name ]; then
+      inventory_host_id=$existing_inventory_id
+      break;
+    fi
+  done
+
+  if [[ $inventory_host_id -eq 0 ]]; then
+    echo -e "\nCouldn't find inventory name configured for inventory host [$inventory_host_name].\nPlease rectify and retry.\nExiting...\n"
+    exit 0
+  fi
+
+  declare post_data=$(echo $inventory_hosts | jq -r ". | {name: .name, enabled: true, inventory: $inventory_host_id}")
+
+  curl -s -X POST -H "Content-Type: application/json" -d "$post_data" -u "$awx_username:$awx_password" "http://$awx_host/api/v2/hosts/" > /dev/null
+
+done
+
+echo ""
