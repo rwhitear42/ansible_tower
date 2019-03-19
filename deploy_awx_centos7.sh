@@ -408,6 +408,16 @@ else
   fi
 fi
 
+echo -e "\nInstalling jq...\n"
+
+yum -y install jq 2>&1
+if [ $? -eq 0 ]; then
+  echo -e "\nInstalled jq\n"
+else
+  echo -e "\nFailed to install jq. Exiting.\n"
+  exit 1
+fi
+
 echo -e "\nInstalling Git...\n"
 
 declare -i git_min_reqd_major_version=1
