@@ -88,14 +88,16 @@ declare new_projects_cnt="$(cat $build_template_file | jq '.projects | length')"
 declare new_orgs_cnt=$(cat $build_template_file | jq '.organizations | length')
 declare new_inventories_cnt=$(cat $build_template_file | jq '.inventories | length')
 declare new_inventory_host_cnt=$(cat $build_template_file | jq '.inventory_hosts | length')
-declare job_templates_count=$(cat $build_template_file | jq '.job_templates | length')
+declare new_job_templates_cnt=$(cat $build_template_file | jq '.job_templates | length')
+declare new_surveys_cnt=$(cat $build_template_file | jq '.surveys | length')
 
 echo -e "\nPlanning to create the following:\n"
 echo -e "$new_orgs_cnt organizations."
 echo -e "$new_inventories_cnt inventories."
 echo -e "$new_inventory_host_cnt inventory hosts."
 echo -e "$new_projects_cnt projects."
-echo -e "$job_templates_count job templates."
+echo -e "$new_job_templates_cnt job templates."
+echo -e "$new_surveys_cnt job template surveys."
 
 
 echo -e "\nCreating organizations...\n"
@@ -146,7 +148,8 @@ do
 
 done
 
-echo ""
+echo -e "\nPausing for 30 seconds in order to allow Git repo synchronisation..."
+sleep 30
 
 echo -e "\nCreating inventories...\n"
 
@@ -221,6 +224,103 @@ do
   declare post_data=$(echo $inventory_hosts | jq -r ". | {name: .name, enabled: true, inventory: $inventory_host_id}")
 
   curl -s -X POST -H "Content-Type: application/json" -d "$post_data" -u "$awx_username:$awx_password" "http://$awx_host/api/v2/hosts/" > /dev/null
+
+done
+
+echo ""
+
+echo -e "\nCreating job templates...\n"
+
+declare existing_inventories="$(curl -s -u $awx_username:$awx_password "http://$awx_host/api/v2/inventories/")"
+declare -i existing_inventories_cnt="$(echo $existing_inventories | jq -r '.results | length')"
+declare existing_projects="$(curl -s -u $awx_username:$awx_password "http://$awx_host/api/v2/projects/")"
+declare -i existing_projects_cnt="$(echo $existing_projects | jq -r '.results | length')"
+
+for (( i=0; i<$new_job_templates_cnt; i++ ))
+do
+  declare job_templates_name=$(cat $build_template_file | jq -r ".job_templates[$i].name")
+  declare job_templates_inventory_name=$(cat $build_template_file | jq -r ".job_templates[$i].inventory")
+  declare job_templates_project_name=$(cat $build_template_file | jq -r ".job_templates[$i].project")
+  declare job_templates=$(cat $build_template_file | jq -r ".job_templates[$i]")
+
+  echo "Creating job template: $job_templates_name"
+
+  declare -i job_templates_inventory_id=0
+
+  for (( j=0; j<$existing_inventories_cnt; j++ ))
+  do
+    existing_inventory_name=$(echo $existing_inventories | jq -r ".results[$j].name")
+    existing_inventory_id=$(echo $existing_inventories | jq -r ".results[$j].id")
+
+    if [ $existing_inventory_name == $job_templates_inventory_name ]; then
+      job_templates_inventory_id=$existing_inventory_id
+      break;
+    fi
+  done
+
+  if [[ $job_templates_inventory_id -eq 0 ]]; then
+    echo -e "\nCouldn't find inventory name configured for jobs_template [$job_templates_name].\nPlease rectify and retry.\nExiting...\n"
+    exit 0
+  fi
+
+  declare -i job_templates_projects_id=0
+
+  for (( j=0; j<$existing_projects_cnt; j++ ))
+  do
+    existing_projects_name=$(echo $existing_projects | jq -r ".results[$j].name")
+    existing_projects_id=$(echo $existing_projects | jq -r ".results[$j].id")
+
+    if [ $existing_projects_name == $job_templates_project_name ]; then
+      job_templates_projects_id=$existing_projects_id
+      break;
+    fi
+  done
+
+  if [[ $job_templates_projects_id -eq 0 ]]; then
+    echo -e "\nCouldn't find project name configured for jobs_template [$job_templates_name].\nPlease rectify and retry.\nExiting...\n"
+    exit 0
+  fi
+
+  declare post_data=$(echo $job_templates | jq -r ". | {name: .name, job_type: \"run\", inventory: $job_templates_inventory_id, project: $job_templates_projects_id, playbook: .playbook, use_fact_cache: true, survey_enabled: true}")
+
+  curl -s -X POST -H "Content-Type: application/json" -d "$post_data" -u "$awx_username:$awx_password" "http://$awx_host/api/v2/job_templates/" > /dev/null
+
+done
+
+echo ""
+
+
+echo -e "\nCreating surveys...\n"
+
+declare existing_job_templates="$(curl -s -u $awx_username:$awx_password "http://$awx_host/api/v2/job_templates/")"
+declare -i existing_job_templates_cnt="$(echo $existing_job_templates | jq -r '.results | length')"
+
+for (( i=0; i<$new_surveys_cnt; i++ ))
+do
+  declare survey_job_template_name=$(cat $build_template_file | jq -r ".surveys[$i].job_template")
+  declare survey_spec=$(cat $build_template_file | jq -r ".surveys[$i].survey_spec")
+
+  echo "Creating survey for job template: $survey_job_template_name"
+
+  declare -i survey_job_template_id=0
+
+  for (( j=0; j<$existing_job_templates_cnt; j++ ))
+  do
+    existing_job_template_name=$(echo $existing_job_templates | jq -r ".results[$j].name")
+    existing_job_template_id=$(echo $existing_job_templates | jq -r ".results[$j].id")
+
+    if [ "$existing_job_template_name" == "$survey_job_template_name" ]; then
+      survey_job_template_id=$existing_job_template_id
+      break;
+    fi
+  done
+
+  if [[ $survey_job_template_id -eq 0 ]]; then
+    echo -e "\nCouldn't find job template name [$survey_job_template_name] in order to configure survey.\nPlease rectify and retry.\nExiting...\n"
+    exit 0
+  fi
+
+  curl -s -X POST -H "Content-Type: application/json" -d "$survey_spec" -u "$awx_username:$awx_password" "http://$awx_host/api/v2/job_templates/$survey_job_template_id/survey_spec/" > /dev/null
 
 done
 
