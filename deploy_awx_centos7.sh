@@ -101,10 +101,10 @@ if [[ $# -ge 1 ]]; then
   while [[ $1 ]]; do
     if [[ $1 == "-h" ]]; then
       echo -e "\n  Usage: sudo ./deploy_awx_centos7.sh"
-      echo -e "\nOptions: --http_proxy http://myproxy:port"
-      echo -e "         --https_proxy http://myproxy:port"
-      echo -e "         --no_proxy domains,ip_addresses"
-      echo -e "\ne.g. sudo ./deploy_awx_centos7.sh --https_proxy http://proxy.esl.cisco.com:80 --no_proxy cisco.com,192.168.3.1\n"
+      echo -e "\n  Options: --http_proxy http://myproxy:port"
+      echo -e "           --https_proxy http://myproxy:port"
+      echo -e "           --no_proxy domains,ip_addresses"
+      echo -e "\n  e.g. sudo ./deploy_awx_centos7.sh --https_proxy http://proxy.esl.cisco.com:80 --no_proxy cisco.com,192.168.3.1\n"
       exit 0
     elif [[ $1 == "--http_proxy" ]]; then
       shift
