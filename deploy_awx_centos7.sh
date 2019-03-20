@@ -408,13 +408,54 @@ else
   fi
 fi
 
+echo -e "\nInstalling tcpdump...\n"
+
+declare tcpdump_installed="$(which tcpdump 2>/dev/null)"
+
+if [ ! $tcpdump_installed == "" ]; then
+  echo "tcpdump installed already. Skipping..."
+else
+  yum -y install tcpdump
+fi
+
+if [ $? -eq 0 ]; then
+  echo -e "\nInstalled tcpdump\n"
+else
+  echo -e "\nFailed to install tcpdump. Exiting.\n"
+  exit 1
+fi
+
 echo -e "\nInstalling jq...\n"
 
-yum -y install jq 2>&1
+declare jq_installed="$(which jq 2>/dev/null)"
+
+if [ ! $jq_installed == "" ]; then
+  echo "jq installed already. Skipping..."
+else
+  yum -y install jq 2>&1
+fi
+
 if [ $? -eq 0 ]; then
   echo -e "\nInstalled jq\n"
 else
   echo -e "\nFailed to install jq. Exiting.\n"
+  exit 1
+fi
+
+echo -e "\nInstalling bind-utils...\n"
+
+declare bind_utils_installed="$(which nslookup 2>/dev/null)"
+
+if [ ! $bind_utils_installed == "" ]; then
+  echo "bind-utils installed already. Skipping..."
+else
+  yum -y install bind-utils 2>&1
+fi
+
+if [ $? -eq 0 ]; then
+  echo -e "\nInstalled bind-utils\n"
+else
+  echo -e "\nFailed to install bind-utils. Exiting.\n"
   exit 1
 fi
 
