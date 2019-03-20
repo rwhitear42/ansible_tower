@@ -1,2 +1,3 @@
 # Ignore auth file
+.DS_Store
 tower_credentials.yml
