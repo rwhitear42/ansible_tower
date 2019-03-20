@@ -1,3 +1,4 @@
 # Ignore auth file
+.gitignore
 .DS_Store
 tower_credentials.yml
