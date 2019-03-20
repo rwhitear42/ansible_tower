@@ -124,8 +124,13 @@ if [[ $# -ge 1 ]]; then
 fi
 
 if ! [ $(id -u) = 0 ]; then
-  echo -e "\nThis script requires root privileges. Please use: sudo deploy_awx_centos7.sh\n"
-  exit 1
+  echo -e "\nThis script requires root privileges.\n"
+  echo -e "\n  Usage: sudo ./deploy_awx_centos7.sh"
+  echo -e "\nOptions: --http_proxy http://myproxy:port"
+  echo -e "         --https_proxy http://myproxy:port"
+  echo -e "         --no_proxy domains,ip_addresses"
+  echo -e "\ne.g. sudo ./deploy_awx_centos7.sh --https_proxy http://proxy.esl.cisco.com:80 --no_proxy cisco.com,192.168.3.1\n"
+  exit 0
 fi
 
 declare sudo_user_homedir="$(eval echo ~${SUDO_USER})"
