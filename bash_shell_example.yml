@@ -3,6 +3,7 @@
   tasks:
   - name: Run shell command
     shell: id
+    become_user: rwhitear
     register: command_result
     args:
       executable: /bin/bash
