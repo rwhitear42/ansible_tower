@@ -1,9 +1,5 @@
 - name: Bash shell playbook
-  hosts:
-  - slightawx.uktme.cisco.com
-  - anuwilliawx.uktme.cisco.com
-  - ssharmanawx.uktme.cisco.com
-
+  hosts: apprentices
   tasks:
   - name: Docker PS
     shell: "docker ps"
