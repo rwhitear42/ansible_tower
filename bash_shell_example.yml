@@ -2,7 +2,7 @@
   hosts: localhost
   tasks:
   - name: Run shell command
-    shell: echo 'not a very good example.'
+    shell: id
     register: command_result
     args:
       executable: /bin/bash
