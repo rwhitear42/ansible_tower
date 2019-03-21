@@ -1,9 +1,12 @@
 - name: Bash shell playbook
-  hosts: slightawx.uktme.cisco.com
+  hosts:
+  - slightawx.uktme.cisco.com
+  - anuwilliawx.uktme.cisco.com
+  - ssharmanawx.uktme.cisco.com
+
   tasks:
-  - name: Run shell command
-    shell: "sudo rwhitear; whoami"
-    become_user: rwhitear
+  - name: Docker PS
+    shell: "docker ps"
     register: command_result
     args:
       executable: /bin/bash
