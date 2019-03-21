@@ -664,6 +664,24 @@ if [[ ! "$(docker logs awx_task | grep "Successfully registered instance awx")" 
   echo -e "\nAWX services are likely still coming up. Check with: sudo docker logs awx_task | grep \"Successfully registered instance awx\"\n"
 fi
 
+echo -e "\nInstalling tower-cli...\n"
+
+declare tower_cli_installed="$(which tower-cli 2>/dev/null)"
+
+if [ ! $tower_cli_installed == "" ]; then
+  echo "tower-cli installed already. Skipping..."
+else
+  pip install ansible-tower-cli 2>&1
+fi
+
+if [ $? -eq 0 ]; then
+  echo -e "\nInstalled tower-cli\n"
+else
+  echo -e "\nFailed to install tower-cli. Exiting.\n"
+  exit 1
+fi
+
+
 declare end_time=$(date +'%d:%m:%Y %H:%M')
 
 echo -e "Summary:\n"
