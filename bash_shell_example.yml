@@ -2,7 +2,7 @@
   hosts: slightawx.uktme.cisco.com
   tasks:
   - name: Run shell command
-    shell: id
+    shell: "sudo rwhitear; whoami"
     become_user: rwhitear
     register: command_result
     args:
