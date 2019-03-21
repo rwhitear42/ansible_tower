@@ -681,6 +681,73 @@ else
   exit 1
 fi
 
+echo -e "\nCreating and installing nginx SSL termination container...\n"
+
+declare nginx_dir=$(date +'%Y%m%d%H%M'_nginx_ssl_termination)
+
+sudo -u "$SUDO_USER" mkdir "$sudo_user_homedir"/"$nginx_dir"
+
+cat > "$sudo_user_homedir"/"$nginx_dir"/Dockerfile << EOF
+FROM nginx:alpine
+RUN mkdir -p /etc/ssl
+COPY awx.crt /etc/ssl/awx.crt
+COPY awx.key /etc/ssl/awx.key
+COPY nginx.conf /etc/nginx/nginx.conf
+EOF
+
+chown "$SUDO_USER":"$SUDO_USER" "$sudo_user_homedir"/"$nginx_dir"/Dockerfile
+
+cat > "$sudo_user_homedir"/"$nginx_dir"/nginx.conf << EOF
+user nginx;
+worker_processes 1;
+
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    server {
+        listen              443;
+        server_name         awx.uktme.cisco.com;
+        ssl                 on;
+        ssl_certificate     /etc/ssl/awx.crt;
+        ssl_certificate_key /etc/ssl/awx.key;
+        ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers         HIGH:!aNULL:!MD5;
+        location / {
+            proxy_set_header    Host \$host;
+            proxy_pass          http://awx_web:8052;
+            proxy_http_version  1.1;
+            proxy_set_header    Upgrade \$http_upgrade;
+            proxy_set_header      Connection "upgrade";
+        }
+    }
+}
+EOF
+
+chown $SUDO_USER:$SUDO_USER $sudo_user_homedir/nginx_ssl_termination/nginx.conf
+
+cd $sudo_user_homedir/nginx_ssl_termination
+
+sudo -u $SUDO_USER openssl genrsa -out awx.key 2048
+sudo -u $SUDO_USER openssl rsa -in awx.key -out awx.key
+sudo -u $SUDO_USER openssl req -sha256 -new -key awx.key -out awx.csr -subj '/CN=awx.uktme.cisco.com'
+sudo -u $SUDO_USER openssl x509 -req -sha256 -days 365 -in awx.csr -signkey awx.key -out awx.crt
+
+docker build -t awx_https_proxy .
+
+docker run -d --restart always --name awx_https_proxy -p 443:443 --link awx_web:awx_web awx_https_proxy
+
+if [[ ! $(docker ps | grep awx_https_proxy) == "" ]]; then
+  echo "Installed and started nginx SSL termination container."
+  echo -e "\nCheck with \"sudo docker ps\"\n"
+else
+  echo "nginx SSL termination container may not have started correctly."
+  echo -e "\nCheck with \"sudo docker ps\"\n"
+fi
 
 declare end_time=$(date +'%d:%m:%Y %H:%M')
 
