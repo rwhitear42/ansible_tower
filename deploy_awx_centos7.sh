@@ -173,7 +173,7 @@ if [ -f /etc/yum.repos.d/cliqr.repo ]; then
 fi
 
 if [ ! $http_proxy == "" ]; then
-  echo "Setting HTTP proxy: $http_proxy"
+  echo -e "\nSetting HTTP proxy: $http_proxy"
   if [[ ! $(egrep "^http_proxy=.*$" /etc/environment) ]]; then
     echo "http_proxy=$http_proxy" >> /etc/environment
   else
@@ -728,9 +728,9 @@ http {
 }
 EOF
 
-chown $SUDO_USER:$SUDO_USER $sudo_user_homedir/nginx_ssl_termination/nginx.conf
+chown "$SUDO_USER":"$SUDO_USER" "$sudo_user_homedir"/"$nginx_dir"/nginx.conf
 
-cd $sudo_user_homedir/nginx_ssl_termination
+cd "$sudo_user_homedir"/"$nginx_dir"
 
 sudo -u $SUDO_USER openssl genrsa -out awx.key 2048
 sudo -u $SUDO_USER openssl rsa -in awx.key -out awx.key
@@ -742,10 +742,10 @@ docker build -t awx_https_proxy .
 docker run -d --restart always --name awx_https_proxy -p 443:443 --link awx_web:awx_web awx_https_proxy
 
 if [[ ! $(docker ps | grep awx_https_proxy) == "" ]]; then
-  echo "Installed and started nginx SSL termination container."
+  echo -e "\nInstalled and started nginx SSL termination container."
   echo -e "\nCheck with \"sudo docker ps\"\n"
 else
-  echo "nginx SSL termination container may not have started correctly."
+  echo -e "\nnginx SSL termination container may not have started correctly."
   echo -e "\nCheck with \"sudo docker ps\"\n"
 fi
 
