@@ -1,5 +1,5 @@
 - name: Bash shell playbook
-  hosts: localhost
+  hosts: slightawx.uktme.cisco.com
   tasks:
   - name: Run shell command
     shell: id
