@@ -1,4 +1,4 @@
-- Bash shell playbook
+- name: Bash shell playbook
   hosts: awx12
   tasks:
   - name: Run shell command
