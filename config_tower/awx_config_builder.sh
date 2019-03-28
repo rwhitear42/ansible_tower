@@ -86,7 +86,7 @@ if [[ $# -ge 1 ]]; then
     if [[ $1 == "-h" ]]; then
       echo -e "\n  Usage: awx_config_builder.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password> [--buildfile <path to build_template.json file>]"
       echo -e "\n  Default build template file location is ./awx_build_template.json"
-      echo -e "\n  e.g. awx_config_builder.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\" --buildfile \"./mybuildfile.json\"\n"
+      echo -e "\n  e.g. ./awx_config_builder.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\" --buildfile \"./mybuildfile.json\"\n"
       exit 0
     elif [[ $1 == "--awx_host" ]]; then
       shift
@@ -112,7 +112,7 @@ fi
 if [[ "$awx_host" == ""  || "$awx_username" == "" || "$awx_password" == "" ]]; then
   echo -e "\n  Usage: awx_config_builder.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password> [--buildfile <path to build_template.json file>]"
   echo -e "\n  Default build template file location is ./awx_build_template.json"
-  echo -e "\n  e.g. awx_config_builder.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\" --buildfile \"./mybuildfile.json\"\n"
+  echo -e "\n  e.g. ./awx_config_builder.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\" --buildfile \"./mybuildfile.json\"\n"
   exit 0
 fi
 
