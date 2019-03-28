@@ -773,7 +773,7 @@ sudo -u $SUDO_USER openssl x509 -req -sha256 -days 365 -in awx.csr -signkey awx.
 
 docker build -t awx_https_proxy .
 
-docker run -d --restart always --name awx_https_proxy -p 443:443 --link awx_web:awx_web awx_https_proxy
+docker run -d --restart always --name awx_https_proxy --net awxcompose_default -p 443:443 --link awx_web:awx_web awx_https_proxy
 
 if [[ ! $(docker ps | grep awx_https_proxy) == "" ]]; then
   echo -e "\nInstalled and started nginx SSL termination container."
