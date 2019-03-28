@@ -320,7 +320,6 @@ else
 fi
 
 
-: << EOF
 echo -e "\nInstalling Docker...\n"
 
 declare docker_installed="$(which docker 2>/dev/null)"
@@ -328,7 +327,7 @@ declare docker_installed="$(which docker 2>/dev/null)"
 if [ ! $docker_installed == "" ]; then
   echo "Docker already installed. Skipping..."
 else
-  yum -y install docker python-docker 2>&1
+  yum -y install docker 2>&1
   if [ $? -eq 0 ]; then
     echo -e "\nInstalled Docker\n"
   else
@@ -336,7 +335,7 @@ else
     exit 1
   fi
 fi
-EOF
+
 
 echo -e "\nInstalling Docker...\n"
 
