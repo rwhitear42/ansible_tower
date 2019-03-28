@@ -84,7 +84,7 @@ if [[ $# -ge 1 ]]; then
   while [[ $1 ]]; do
     if [[ $1 == "-h" ]]; then
       echo -e "\n  Usage: clear_awx_config.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password>"
-      echo -e "\n  e.g. clear_awx_config.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\"\n"
+      echo -e "\n  e.g. ./clear_awx_config.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\"\n"
       exit 0
     elif [[ $1 == "--awx_host" ]]; then
       shift
@@ -103,13 +103,13 @@ if [[ $# -ge 1 ]]; then
   done
 else
   echo -e "\n  Usage: clear_awx_config.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password>"
-  echo -e "\n  e.g. clear_awx_config.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\"\n"
+  echo -e "\n  e.g. ./clear_awx_config.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\"\n"
   exit 0
 fi
 
 if [[ "$awx_host" == ""  || "$awx_username" == "" || "$awx_password" == "" ]]; then
   echo -e "\n  Usage: clear_awx_config.sh --awx_host <AWX FQDN or IP> --awx_username <AWX Username> --awx_password <AWX Password>"
-  echo -e "\n  e.g. clear_awx_config.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\"\n"
+  echo -e "\n  e.g. ./clear_awx_config.sh --awx_host \"192.168.3.1\" --awx_username \"admin\" --awx_password \"password\"\n"
   exit 0
 fi
 
