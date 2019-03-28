@@ -319,6 +319,8 @@ else
   exit 1
 fi
 
+
+: << EOF
 echo -e "\nInstalling Docker...\n"
 
 declare docker_installed="$(which docker 2>/dev/null)"
@@ -331,6 +333,39 @@ else
     echo -e "\nInstalled Docker\n"
   else
     echo -e "\nFailed to install Docker. Exiting.\n"
+    exit 1
+  fi
+fi
+EOF
+
+echo -e "\nInstalling Docker...\n"
+
+declare docker_installed="$(which docker 2>/dev/null)"
+
+if [ ! $docker_installed == "" ]; then
+  echo "Docker already installed. Skipping..."
+else
+  pip install docker 2>&1
+  if [ $? -eq 0 ]; then
+    echo -e "\nInstalled Docker\n"
+  else
+    echo -e "\nFailed to install Docker. Exiting.\n"
+    exit 1
+  fi
+fi
+
+echo -e "\nInstalling Docker Compose...\n"
+
+declare compose_installed="$(which docker-compose 2>/dev/null)"
+
+if [ ! $compose_installed == "" ]; then
+  echo "Docker Compose already installed. Skipping..."
+else
+  pip install docker-compose 2>&1
+  if [ $? -eq 0 ]; then
+    echo -e "\nInstalled Docker Compose\n"
+  else
+    echo -e "\nFailed to install Docker Compose. Exiting.\n"
     exit 1
   fi
 fi
