@@ -637,7 +637,7 @@ cd "$sudo_user_homedir/$awx_dir/installer"
 
 # Build without preloaded data.
 sed -i "s/create_preload_data=True/create_preload_data=False/" ./inventory
-sed -i s/postgres_data_dir=\/tmp\/pgdocker/postgres_data_dir=\/var\/lib\/pgdocker/ ./inventory
+sed -i 's/postgres_data_dir=\/tmp\/pgdocker/postgres_data_dir=\/var\/lib\/pgdocker/' ./inventory
 sed -i 's/docker_compose_dir=\/tmp\/awxcompose/docker_compose_dir=\/var\/lib\/awxcompose/' ./inventory
 
 if [ ! $https_proxy == "" ]; then
