@@ -229,13 +229,13 @@
       content:
         vzBrCP:
           attributes:
-            name:     "permit_to_{{ prov_ap_name }}_{{ prov_epg_name }}"
+            name:     "provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by_{{ cons_ap_name }}_{{ cons_epg_name }}"
             scope:    "{{ scope }}"
             status:   "created,modified"
 
   - name:             Define the contract tenant name
     set_fact:
-      cont_name:      "permit_to_{{ prov_ap_name }}_{{ prov_epg_name }}"
+      cont_name:      "provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by_{{ cons_ap_name }}_{{ cons_epg_name }}"
     register:         cont_name
 
   # Add subject and filter to the contract
