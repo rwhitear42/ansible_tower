@@ -224,7 +224,7 @@
       <<: *apic_info
       validate_certs: no
       use_proxy:      no
-      path:           /api/node/mo/uni/tn-{{ prov_tn_name }}/brc-permit_to_{{ prov_ap_name }}_{{ prov_epg_name }}.json
+      path:           /api/node/mo/uni/tn-{{ prov_tn_name }}/brc-provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by_{{ cons_ap_name }}_{{ cons_epg_name }}.json
       method:         post
       content:
         vzBrCP:
