@@ -224,18 +224,18 @@
       <<: *apic_info
       validate_certs: no
       use_proxy:      no
-      path:           /api/node/mo/uni/tn-{{ prov_tn_name }}/brc-provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by.json
+      path:           /api/node/mo/uni/tn-{{ prov_tn_name }}/brc-provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by_1234567890.json
       method:         post
       content:
         vzBrCP:
           attributes:
-            name:     "provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by"
+            name:     "provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by_1234567890"
             scope:    "{{ scope }}"
             status:   "created,modified"
 
   - name:             Define the contract tenant name
     set_fact:
-      cont_name:      "provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by"
+      cont_name:      "provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by_1234567890"
     register:         cont_name
 
   # Add subject and filter to the contract
@@ -244,7 +244,7 @@
       <<: *apic_info
       validate_certs: no
       use_proxy:      no
-      path:           /api/node/mo/uni/tn-{{ prov_tn_name }}/brc-provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by/subj-{{ subj_name }}.json
+      path:           /api/node/mo/uni/tn-{{ prov_tn_name }}/brc-provided_by_{{ prov_ap_name }}_{{ prov_epg_name }}_consumed_by_1234567890/subj-{{ subj_name }}.json
       method:         post
       content:
         vzSubj:
