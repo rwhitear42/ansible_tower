@@ -106,14 +106,14 @@
 
   tasks:
   # Create an ACI snapshot
-  - name:             Create an APIC Snapshot
-    aci_config_snapshot:
-      <<: *apic_info
-      validate_certs: no
-      state:          present
-      export_policy:  config_backup
-      max_count:      10
-      description:    Snapshot Created by Ansible
+  #- name:             Create an APIC Snapshot
+  #  aci_config_snapshot:
+  #    <<: *apic_info
+  #    validate_certs: no
+  #    state:          present
+  #    export_policy:  config_backup
+  #    max_count:      10
+  #    description:    Snapshot Created by Ansible
 
   # Check that the supplied source IP address is registered on the fabric
   # and discover its EPG
